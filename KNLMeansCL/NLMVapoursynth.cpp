@@ -138,10 +138,17 @@ static const VSFrameRef *VS_CC VapourSynthPluginGetFrame(int n, int activationRe
 
         // Set-up buffers
         cl_int ret = CL_SUCCESS;
+        // Apple's clEnqueueFillBuffer silently fails to sync when event output
+        // param is NULL, leaving stale or garbage data in the buffer. Pass a
+        // temp event to ensure synchronization. See
+        // https://gitlab.com/gromacs/gromacs/-/work_items/4852
+        cl_event fill_event;
         ret |= clEnqueueFillBuffer(d->command_queue, d->mem_U[memU2], &pattern_u2,
-            sizeof(cl_float), 0, size_u2, 0, NULL, NULL);
+            sizeof(cl_float), 0, size_u2, 0, NULL, &fill_event);
+        clReleaseEvent(fill_event);
         ret |= clEnqueueFillBuffer(d->command_queue, d->mem_U[memU5], &pattern_u5,
-            sizeof(cl_float), 0, size_u5, 0, NULL, NULL);
+            sizeof(cl_float), 0, size_u5, 0, NULL, &fill_event);
+        clReleaseEvent(fill_event);
 
         // Read image
         for (int k = k_start; k <= k_end; k++) {
