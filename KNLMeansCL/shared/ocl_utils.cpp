@@ -220,13 +220,13 @@ cl_int oclUtilsGetIDs(cl_device_type device_type, cl_uint shf_device, cl_platfor
                         }
                     }
                 }
-                else if (ret != CL_DEVICE_NOT_FOUND) {
+                else if (ret != CL_DEVICE_NOT_FOUND && ret != CL_INVALID_VALUE) {
                     free(platformIDs);
                     free(deviceIDs);
                     return ret;
                 }
             }
-            else if (ret != CL_DEVICE_NOT_FOUND) {
+            else if (ret != CL_DEVICE_NOT_FOUND && ret != CL_INVALID_VALUE) {
                 free(platformIDs);
                 return ret;
             }
