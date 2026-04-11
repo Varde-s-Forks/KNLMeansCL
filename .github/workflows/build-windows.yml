@@ -21,43 +21,36 @@ jobs:
       - name: Cache vcpkg packages
         uses: actions/cache@v5
         with:
-          path: |
-            ${{ env.VCPKG_INSTALLATION_ROOT }}\installed
-            ${{ env.VCPKG_INSTALLATION_ROOT }}\downloads
-          key: ${{ runner.os }}-vcpkg-x64-${{ hashFiles('.github/workflows/*.yml') }}
+          path: vcpkg_installed
+          key: ${{ runner.os }}-vcpkg-x64-${{ hashFiles('vcpkg.json') }}
           restore-keys: ${{ runner.os }}-vcpkg-x64-
 
-      # Install all native deps via the pre-installed vcpkg
-      # If cached, vcpkg will see them as already installed and finish almost instantly.
       - name: Install vcpkg packages
         shell: pwsh
         run: |
           vcpkg install `
-            opencl:x64-windows `
-            boost-filesystem:x64-windows-static `
-            boost-system:x64-windows-static `
-            pkgconf:x64-windows
+            --triplet x64-windows-static `
+            --x-install-root=vcpkg_installed
 
           # Expose pkgconf as pkg-config on PATH
-          $toolsDir = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows\tools\pkgconf"
+          $toolsDir = "${{ github.workspace }}\vcpkg_installed\x64-windows-static\tools\pkgconf"
           if (Test-Path "$toolsDir\pkgconf.exe") {
-            Copy-Item "$toolsDir\pkgconf.exe" "$toolsDir\pkg-config.exe" -Force
+            if (-not (Test-Path "$toolsDir\pkg-config.exe")) {
+              Copy-Item "$toolsDir\pkgconf.exe" "$toolsDir\pkg-config.exe" -Force
+            }
           }
           "$toolsDir" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         env:
           VCPKG_ROOT: ${{ env.VCPKG_INSTALLATION_ROOT }}
 
-      # Extend MSVC's LIB/INCLUDE (set by ilammy/msvc-dev-cmd) to include vcpkg dirs.
-      - name: Meson setup
+      - name: Meson setup and build
         shell: pwsh
         run: |
-          $vcpkgInstalled = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows"
-          $vcpkgStatic = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows-static"
-
-          $env:LIB = "$vcpkgInstalled\lib;$vcpkgStatic\lib;$env:LIB"
-          $env:INCLUDE = "$vcpkgInstalled\include;$env:INCLUDE"
-          $env:PKG_CONFIG_PATH = "$vcpkgInstalled\lib\pkgconfig;$vcpkgStatic\lib\pkgconfig"
-          $env:BOOST_ROOT = "$vcpkgStatic"
+          $vcpkgRoot = "${{ github.workspace }}\vcpkg_installed\x64-windows-static"
+          $env:LIB = "$vcpkgRoot\lib;$env:LIB"
+          $env:INCLUDE = "$vcpkgRoot\include;$env:INCLUDE"
+          $env:PKG_CONFIG_PATH = "$vcpkgRoot\lib\pkgconfig"
+          $env:BOOST_ROOT = "$vcpkgRoot"
           $env:MESON_ARGS = "-Db_vscrt=mt -Denable_avs=false -Dstatic=true"
           uv build --wheel
 

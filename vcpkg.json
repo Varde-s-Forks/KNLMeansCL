@@ -1,0 +1,10 @@
+{
+  "name": "knlmeanscl",
+  "version-string": "1.1.1",
+  "dependencies": [
+    "boost-filesystem",
+    "boost-system",
+    "pkgconf",
+    "opencl"
+  ]
+}

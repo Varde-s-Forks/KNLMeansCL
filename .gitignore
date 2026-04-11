@@ -478,3 +478,5 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+# vcpkg
+vcpkg_installed/

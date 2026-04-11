@@ -23,17 +23,15 @@ jobs:
         uses: actions/cache@v5
         with:
           path: |
-            /usr/local/share/vcpkg/installed
-            /usr/local/share/vcpkg/downloads
-          key: ${{ runner.os }}-vcpkg-${{ matrix.arch }}-${{ hashFiles('.github/workflows/*.yml') }}
+            vcpkg_installed
+          key: ${{ runner.os }}-vcpkg-${{ matrix.arch }}-${{ hashFiles('vcpkg.json') }}
           restore-keys: ${{ runner.os }}-vcpkg-${{ matrix.arch }}-
 
       - name: Install vcpkg packages
         run: |
           vcpkg install \
-            boost-filesystem:${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx \
-            boost-system:${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx \
-            pkgconf:${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx
+            --triplet ${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx \
+            --x-install-root=vcpkg_installed
         env:
           VCPKG_ROOT: /usr/local/share/vcpkg
 
@@ -44,8 +42,8 @@ jobs:
           CIBW_BUILD_FRONTEND: uv
           CIBW_ENVIRONMENT_MACOS: >
             MESON_ARGS="-Denable_avs=false -Dstatic=true"
-            PKG_CONFIG_PATH="/usr/local/share/vcpkg/installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx/lib/pkgconfig"
-            BOOST_ROOT="/usr/local/share/vcpkg/installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx"
+            PKG_CONFIG_PATH="${{ github.workspace }}/vcpkg_installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx/lib/pkgconfig"
+            BOOST_ROOT="${{ github.workspace }}/vcpkg_installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx"
             MACOSX_DEPLOYMENT_TARGET=15
         with:
           extras: uv
