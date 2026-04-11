@@ -1,0 +1,49 @@
+[build-system]
+requires = [
+    "hatchling>=1.27.0",
+    "vapoursynth>=74",
+    "meson",
+    "ninja",
+    "packaging",
+]
+build-backend = "hatchling.build"
+
+[project]
+name = "vapoursynth-knlmeanscl"
+dynamic = ["version"]
+description = "Optimized OpenCL implementation of the Non-local means de-noising algorithm"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+authors = [{ name = "Edoardo Brunetti", email = "edo.brunetti@gmail.com" }]
+maintainers = [
+    { name = "Jaded Encoding Thaumaturgy", email = "jaded.encoding.thaumaturgy@gmail.com" },
+]
+dependencies = ["vapoursynth>=74"]
+
+[dependency-groups]
+dev = ["hatchling>=1.27.0", "packaging"]
+
+[project.urls]
+"Source Code" = "https://github.com/Jaded-Encoding-Thaumaturgy/KNLMeansCL"
+"Bug Tracker" = "https://github.com/Jaded-Encoding-Thaumaturgy/KNLMeansCL/issues"
+"Contact" = "https://discord.gg/XTpc6Fa9eB"
+
+[tool.hatch.version]
+path = "meson.build"
+pattern = "version\\s*:\\s*'(?P<version>\\d+\\.\\d+\\.\\d+)'"
+
+[tool.hatch.build.targets.sdist]
+include = ["KNLMeansCL", "meson.build", "meson_options.txt"]
+
+[tool.hatch.build.targets.wheel]
+include = ["vapoursynth/plugins"]
+artifacts = [
+    "vapoursynth/plugins/*.dylib",
+    "vapoursynth/plugins/*.so",
+    "vapoursynth/plugins/*.dll",
+]
+
+[tool.hatch.build.targets.wheel.hooks.custom]
+path = "hatch_build.py"
