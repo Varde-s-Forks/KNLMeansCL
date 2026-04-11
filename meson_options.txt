@@ -1,0 +1,20 @@
+option(
+  'enable_vs',
+  type: 'boolean',
+  value: true,
+  description: 'Include VapourSynth plugin support in the library',
+)
+
+option(
+  'enable_avs',
+  type: 'boolean',
+  value: false,
+  description: 'Include AviSynth+ plugin support in the library',
+)
+
+option(
+  'static',
+  type: 'boolean',
+  value: false,
+  description: 'Link dependencies (like Boost) and standard libraries statically where possible',
+)
