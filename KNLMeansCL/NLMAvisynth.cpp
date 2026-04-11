@@ -346,7 +346,11 @@ NLMAvisynth::NLMAvisynth(PClip _child, const int _d, const int _a, const int _s,
     oclErrorCheck("clCreateContext", ret, env);
 
     // Create a command queue
+#ifdef __APPLE__
     command_queue = clCreateCommandQueue(context, deviceID, 0, &ret);
+#else
+    command_queue = clCreateCommandQueueWithProperties(context, deviceID, NULL, &ret);
+#endif
     oclErrorCheck("clCreateCommandQueue", ret, env);
 
     // Create mem_U[]

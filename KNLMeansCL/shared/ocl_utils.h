@@ -19,10 +19,11 @@
 #ifndef __OCL_UTILS_H
 #define __OCL_UTILS_H
 
-#define CL_TARGET_OPENCL_VERSION 120
 #ifdef __APPLE__
+#define CL_TARGET_OPENCL_VERSION 120
 #include <OpenCL/opencl.h>
 #else
+#define CL_TARGET_OPENCL_VERSION 200
 #include <CL/opencl.h>
 #endif
 
