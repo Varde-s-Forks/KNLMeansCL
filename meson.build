@@ -27,6 +27,11 @@ if is_static and host_machine.system() == 'linux'
 endif
 
 common_deps = [opencl_dep, boost_dep]
+if host_machine.system() == 'windows'
+  cpp = meson.get_compiler('cpp')
+  common_deps += cpp.find_library('cfgmgr32')
+  common_deps += cpp.find_library('runtimeobject', required: false)
+endif
 
 # Shared sources (kernel + utilities) used by both plugins
 shared_src = [
