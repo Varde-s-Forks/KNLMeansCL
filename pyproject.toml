@@ -26,13 +26,14 @@ dependencies = ["vapoursynth>=74"]
 dev = ["hatchling>=1.27.0", "packaging"]
 
 [project.urls]
-"Source Code" = "https://github.com/Jaded-Encoding-Thaumaturgy/KNLMeansCL"
-"Bug Tracker" = "https://github.com/Jaded-Encoding-Thaumaturgy/KNLMeansCL/issues"
+"Source Code" = "https://github.com/Jaded-Encoding-Thaumaturgy/vapoursynth-knlmeanscl"
+"Bug Tracker" = "https://github.com/Jaded-Encoding-Thaumaturgy/vapoursynth-knlmeanscl/issues"
+"Changelog" = "https://github.com/Jaded-Encoding-Thaumaturgy/vapoursynth-knlmeanscl/blob/master/CHANGELOG"
 "Contact" = "https://discord.gg/XTpc6Fa9eB"
 
 [tool.hatch.version]
 path = "meson.build"
-pattern = "version\\s*:\\s*'(?P<version>\\d+\\.\\d+\\.\\d+)'"
+pattern = "version\\s*:\\s*'(?P<version>\\d+\\.\\d+)'"
 
 [tool.hatch.build.targets.sdist]
 include = ["KNLMeansCL", "meson.build", "meson_options.txt"]
