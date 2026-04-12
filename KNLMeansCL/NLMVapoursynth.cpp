@@ -346,7 +346,7 @@ static const VSFrame *VS_CC VapourSynthPluginGetFrame(int n, int activationReaso
             uint8_t y = 0, *frm = vsapi->getWritePtr(dst, 0);
             int pitch = vsapi->getStride(dst, 0);
             char buffer[8192], str[2048], str1[2048];
-            DrawString(frm, pitch, 0, y++, "KNLMeansCL");
+            DrawString(frm, pitch, 0, y++, "KNLMeansCL v" KNL_VERSION_STRING);
             snprintf(buffer, sizeof(buffer), " Bits per sample: %i", d->vi->format.bitsPerSample);
             DrawString(frm, pitch, 0, y++, buffer);
             snprintf(buffer, sizeof(buffer), " Search window: %" PRId64 "x%" PRId64 "x%" PRId64,
@@ -1095,7 +1095,7 @@ static void VS_CC VapourSynthPluginCreate(const VSMap *in, VSMap *out, void *use
 VS_EXTERNAL_API(void) VapourSynthPluginInit2(VSPlugin *plugin, const VSPLUGINAPI *vspapi)
 {
     vspapi->configPlugin("com.Khanattila.KNLMeansCL", "knlm", "KNLMeansCL for VapourSynth",
-        VS_MAKE_VERSION(1, 1), VAPOURSYNTH_API_VERSION, 0, plugin);
+        VS_MAKE_VERSION(KNL_MAJOR_VERSION, KNL_MINOR_VERSION), VAPOURSYNTH_API_VERSION, 0, plugin);
     vspapi->registerFunction("KNLMeansCL",
         "clip:vnode;d:int:opt;a:int:opt;s:int:opt;h:float:opt;channels:data:opt;wmode:int:opt;"
         "wref:float:opt;rclip:vnode:opt;device_type:data:opt;device_id:int:opt;ocl_x:int:opt;ocl_y:int:opt;ocl_r:int:opt;"

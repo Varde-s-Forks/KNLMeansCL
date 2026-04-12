@@ -3,8 +3,16 @@ project(
   'cpp',
   default_options: ['cpp_std=c++14', 'buildtype=release'],
   license: 'GPL-3',
-  version: '1.1.1',
+  version: '1.2',
 )
+
+version_parts = meson.project_version().split('.')
+major = version_parts[0]
+minor = version_parts[1]
+
+add_project_arguments('-DKNL_MAJOR_VERSION=' + major, language: 'cpp')
+add_project_arguments('-DKNL_MINOR_VERSION=' + minor, language: 'cpp')
+add_project_arguments('-DKNL_VERSION_STRING="' + meson.project_version() + '"', language: 'cpp')
 
 enable_vs = get_option('enable_vs')
 enable_avs = get_option('enable_avs')

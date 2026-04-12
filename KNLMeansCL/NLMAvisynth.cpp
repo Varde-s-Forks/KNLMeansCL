@@ -1018,7 +1018,7 @@ PVideoFrame __stdcall NLMAvisynth::GetFrame(int n, IScriptEnvironment* env)
         uint8_t y = 0, *frm = dst->GetWritePtr(PLANAR_Y);
         int pitch = dst->GetPitch(PLANAR_Y);
         char buffer[2048], str[2048], str1[2048];
-        DrawString(frm, pitch, 0, y++, "KNLMeansCL");
+        DrawString(frm, pitch, 0, y++, "KNLMeansCL v" KNL_VERSION_STRING);
         snprintf(buffer, 2048, " Bits per sample: %i", stacked ? 16 : vi.BitsPerComponent());
         DrawString(frm, pitch, 0, y++, buffer);
         snprintf(buffer, 2048, " Search window: %ix%ix%i", 2 * a + 1, 2 * a + 1, 2 * d + 1);
@@ -1128,7 +1128,7 @@ extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(
     AVS_linkage = vectors;
     env->AddFunction("KNLMeansCL", "c[d]i[a]i[s]i[h]f[channels]s[wmode]i[wref]f[rclip]c[device_type]s[device_id]i\
 [ocl_x]i[ocl_y]i[ocl_r]i[stacked]b[info]b[mode_9_to_15bits]i", AviSynthPluginCreate, 0);
-    return "KNLMeansCL for AviSynth";
+    return "KNLMeansCL v" KNL_VERSION_STRING;
 }
 
 #endif //__AVISYNTH_8_H__
