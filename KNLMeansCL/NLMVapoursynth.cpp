@@ -347,8 +347,6 @@ static const VSFrame *VS_CC VapourSynthPluginGetFrame(int n, int activationReaso
             int pitch = vsapi->getStride(dst, 0);
             char buffer[8192], str[2048], str1[2048];
             DrawString(frm, pitch, 0, y++, "KNLMeansCL");
-            DrawString(frm, pitch, 0, y++, " Version " VERSION);
-            DrawString(frm, pitch, 0, y++, " Copyright(C) Khanattila");
             snprintf(buffer, sizeof(buffer), " Bits per sample: %i", d->vi->format.bitsPerSample);
             DrawString(frm, pitch, 0, y++, buffer);
             snprintf(buffer, sizeof(buffer), " Search window: %" PRId64 "x%" PRId64 "x%" PRId64,

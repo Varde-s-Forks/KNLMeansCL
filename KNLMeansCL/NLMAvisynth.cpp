@@ -1019,8 +1019,6 @@ PVideoFrame __stdcall NLMAvisynth::GetFrame(int n, IScriptEnvironment* env)
         int pitch = dst->GetPitch(PLANAR_Y);
         char buffer[2048], str[2048], str1[2048];
         DrawString(frm, pitch, 0, y++, "KNLMeansCL");
-        DrawString(frm, pitch, 0, y++, " Version " VERSION);
-        DrawString(frm, pitch, 0, y++, " Copyright(C) Khanattila");
         snprintf(buffer, 2048, " Bits per sample: %i", stacked ? 16 : vi.BitsPerComponent());
         DrawString(frm, pitch, 0, y++, buffer);
         snprintf(buffer, 2048, " Search window: %ix%ix%i", 2 * a + 1, 2 * a + 1, 2 * d + 1);
