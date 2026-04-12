@@ -1,3 +1,16 @@
+v1.2
+   - Migrate VapourSynth plugin to API v4
+   - Remove legacy Visual Studio and Travis CI files
+   - Add Python wheel packaging support for VapourSynth
+   - Implement GitHub Actions CI workflows for Windows, Linux, and macOS
+   - Integrate vcpkg for cross-platform dependency management
+   - Improve OpenCL device selection logic and fallback handling
+   - Remove internal VapourSynth headers in favor of Python discovery
+   - Remove on-screen version and copyright info overlays from frames
+   - Automatically retrieve version from build system
+   - Use event to ensure synchronized CL buffer fill
+   - Fix auto device type fallbacks on platforms that use CL_INVALID_VALUE for unused types
+
 v1.1.1e [20201112 (pinterf)]
    - Update internal VERSION with 'e' shown in 'info' pages
    - New: Add (debug) parameter: 'mode_9_to_15bits' (integer). Values 0, 1 (default), 2
