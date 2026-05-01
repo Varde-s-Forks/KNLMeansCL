@@ -190,12 +190,15 @@ cl_int oclUtilsGetIDs(cl_device_type device_type, cl_uint shf_device, cl_platfor
         if (ret != CL_SUCCESS) return ret;
         if (plt_found) {
 
-            // Get OpenCl devies
+            // Get OpenCL devices
             cl_uint num_devices;
             ret = clGetDeviceIDs(platformIDs[i], device_type, 0, NULL, &num_devices);
             if (ret == CL_SUCCESS && num_devices > 0) {
                 cl_device_id *deviceIDs = (cl_device_id*)malloc(sizeof(cl_device_id) * num_devices);
-                if (deviceIDs == NULL) return OCL_UTILS_MALLOC_ERROR;
+                if (deviceIDs == NULL) {
+                    free(platformIDs);
+                    return OCL_UTILS_MALLOC_ERROR;
+                }
                 ret = clGetDeviceIDs(platformIDs[i], device_type, num_devices, deviceIDs, NULL);
                 if (ret == CL_SUCCESS && num_devices > 0) {
 
@@ -220,17 +223,8 @@ cl_int oclUtilsGetIDs(cl_device_type device_type, cl_uint shf_device, cl_platfor
                         }
                     }
                 }
-                else if (ret != CL_DEVICE_NOT_FOUND && ret != CL_INVALID_VALUE) {
-                    free(platformIDs);
-                    free(deviceIDs);
-                    return ret;
-                }
+                free(deviceIDs);
             }
-            else if (ret != CL_DEVICE_NOT_FOUND && ret != CL_INVALID_VALUE) {
-                free(platformIDs);
-                return ret;
-            }
-
         }
     }
     free(platformIDs);
@@ -253,12 +247,13 @@ cl_int oclUtilsGetPlaformDeviceIDs(cl_uint device_type, cl_uint shf_device, cl_p
         case OCL_UTILS_DEVICE_TYPE_AUTO:
             {
                 cl_int ret = oclUtilsGetIDs(CL_DEVICE_TYPE_ACCELERATOR, shf_device, platform, device);
-                if (ret == OCL_UTILS_NO_DEVICE_AVAILABLE) {
+                if (ret != CL_SUCCESS) {
                     ret = oclUtilsGetIDs(CL_DEVICE_TYPE_GPU, shf_device, platform, device);
-                    if (ret == OCL_UTILS_NO_DEVICE_AVAILABLE) {
+                    if (ret != CL_SUCCESS) {
                         return oclUtilsGetIDs(CL_DEVICE_TYPE_CPU, shf_device, platform, device);
-                    } return ret;
-                } return ret;
+                    }
+                }
+                return ret;
             }
         default:
             return OCL_UTILS_INVALID_DEVICE_TYPE;
