@@ -41,7 +41,30 @@ jobs:
       - name: Install OpenCL Runtime (PoCL)
         run: |
           brew install pocl clinfo
-          clinfo || true
+          
+          # Find pocl.icd
+          POCL_ICD_FILE=$(find $(brew --prefix pocl) -name "pocl.icd" | head -n 1)
+          echo "Found pocl.icd at: $POCL_ICD_FILE"
+          
+          if [ -z "$POCL_ICD_FILE" ]; then
+            echo "pocl.icd not found, searching for libpocl.dylib..."
+            LIBPOCL=$(find $(brew --prefix pocl) -name "libpocl.dylib" | head -n 1)
+            if [ -n "$LIBPOCL" ]; then
+              echo "Found libpocl at: $LIBPOCL"
+              mkdir -p ./icd_vendors
+              echo "$LIBPOCL" > ./icd_vendors/pocl.icd
+              POCL_ICD_DIR="$(pwd)/icd_vendors"
+            fi
+          else
+            POCL_ICD_DIR=$(dirname "$POCL_ICD_FILE")
+          fi
+          
+          if [ -n "$POCL_ICD_DIR" ]; then
+            echo "OCL_ICD_VENDORS=$POCL_ICD_DIR" >> $GITHUB_ENV
+            export OCL_ICD_VENDORS="$POCL_ICD_DIR"
+            echo "Testing with clinfo..."
+            clinfo || true
+          fi
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v3.4
@@ -52,6 +75,7 @@ jobs:
             PKG_CONFIG_PATH="${{ github.workspace }}/vcpkg_installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx/lib/pkgconfig:/opt/homebrew/lib/pkgconfig:/usr/local/lib/pkgconfig"
             BOOST_ROOT="${{ github.workspace }}/vcpkg_installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx"
             MACOSX_DEPLOYMENT_TARGET=15
+            OCL_ICD_VENDORS="$OCL_ICD_VENDORS"
 
       - name: Install and run tests
         run: |
