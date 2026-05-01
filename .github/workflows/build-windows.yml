@@ -57,6 +57,53 @@ jobs:
           $env:MESON_ARGS = "-Db_vscrt=mt -Denable_avs=false -Dstatic=true"
           uv build --wheel
 
+      - name: Cache Intel OpenCL CPU Runtime
+        id: cache-ocl
+        uses: actions/cache@v5
+        with:
+          path: C:\Program Files (x86)\Common Files\Intel
+          key: ${{ runner.os }}-intel-opencl-2025.3.1.762
+
+      - name: Install Intel OpenCL CPU Runtime
+        if: steps.cache-ocl.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          $installer = "${{ runner.temp }}\ocl_runtime.exe"
+          curl.exe -L "https://registrationcenter-download.intel.com/akdlm/IRC_NAS/ad824c04-01c8-4ae5-b5e8-164a04f67609/w_opencl_runtime_p_2025.3.1.762.exe" `
+            --output $installer
+
+          # Extract the MSI from the wrapper
+          $extractDir = "${{ runner.temp }}\ocl_ext"
+          Start-Process -FilePath $installer `
+            -ArgumentList "--silent", "--extract-folder", "$extractDir", "--extract-only" `
+            -Wait
+
+          # Find and install the MSI silently
+          $msi = Get-ChildItem -Path $extractDir -Filter "*.msi" -Recurse | Select-Object -First 1
+          if ($msi) {
+            Write-Host "Installing MSI: $($msi.FullName)"
+            Start-Process -FilePath "msiexec.exe" -ArgumentList "/i", "`"$($msi.FullName)`"", "/qn", "/norestart" -Wait
+          } else {
+            Write-Error "MSI not found in extracted files."
+            exit 1
+          }
+
+      - name: Install and run tests
+        shell: pwsh
+        run: |
+          $dll = Get-ChildItem -Path "C:\Program Files (x86)\Common Files\Intel" -Filter "intelocl64.dll" -Recurse | Select-Object -First 1
+          if ($dll) {
+            $env:OCL_ICD_FILENAMES = $dll.FullName
+            Write-Host "Using OpenCL ICD: $env:OCL_ICD_FILENAMES"
+          } else {
+            Write-Warning "Intel OpenCL ICD not found. Tests may fail if no other OpenCL runtime is present."
+          }
+
+          uv sync --no-install-project
+          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
+          uv pip install $wheel.FullName
+          uv run --no-sync pytest -v tests
+
       - name: Upload VapourSynth plugin
         uses: actions/upload-artifact@v7
         with:

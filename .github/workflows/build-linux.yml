@@ -25,14 +25,32 @@ jobs:
         env:
           CIBW_BUILD: cp312-*
           CIBW_ARCHS_LINUX: ${{ matrix.arch }}
-          CIBW_BUILD_FRONTEND: uv
           CIBW_BEFORE_ALL_LINUX: >
             dnf install -y epel-release &&
             dnf --enablerepo=powertools install -y ocl-icd-devel boost-devel pkgconf-pkg-config
           CIBW_ENVIRONMENT: MESON_ARGS="-Denable_avs=false -Dstatic=true"
           CIBW_SKIP: "*-musllinux*"
-        with:
-          extras: uv
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v8.1.0
+
+      - name: Install Intel OpenCL CPU Runtime (x86_64 only)
+        if: matrix.arch == 'x86_64'
+        run: |
+          wget -qO - https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB \
+            | sudo gpg --dearmor -o /usr/share/keyrings/intel-oneapi-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/intel-oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" \
+            | sudo tee /etc/apt/sources.list.d/oneAPI.list
+          sudo apt-get update
+          sudo apt-get install -y intel-oneapi-runtime-opencl
+
+      - name: Install and run tests
+        if: matrix.arch == 'x86_64'
+        run: |
+          uv sync --no-install-project
+          wheel=$(ls ./wheelhouse/*.whl | head -1)
+          uv pip install "$wheel"
+          uv run --no-sync pytest -v tests
 
       - name: Upload VapourSynth plugin
         uses: actions/upload-artifact@v7
