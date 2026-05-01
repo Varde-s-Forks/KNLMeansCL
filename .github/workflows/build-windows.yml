@@ -57,6 +57,17 @@ jobs:
           $env:MESON_ARGS = "-Db_vscrt=mt -Denable_avs=false -Dstatic=true"
           uv build --wheel
 
+      - name: Install OpenCL Runtime via Chocolatey
+        run: choco install intel-oneapi-runtime-opencl -y
+
+      - name: Install and run tests
+        shell: pwsh
+        run: |
+          uv sync --no-install-project
+          $wheel = Get-ChildItem dist/*.whl | Select-Object -First 1
+          uv pip install $wheel.FullName
+          uv run --no-sync pytest -v tests
+
       - name: Upload VapourSynth plugin
         uses: actions/upload-artifact@v7
         with:

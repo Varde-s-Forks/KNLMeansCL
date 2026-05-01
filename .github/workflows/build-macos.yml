@@ -42,14 +42,13 @@ jobs:
         uses: pypa/cibuildwheel@v3.4
         env:
           CIBW_BUILD: cp312-*
-          CIBW_BUILD_FRONTEND: uv
           CIBW_ENVIRONMENT_MACOS: >
             MESON_ARGS="-Denable_avs=false -Dstatic=true"
             PKG_CONFIG_PATH="${{ github.workspace }}/vcpkg_installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx/lib/pkgconfig"
             BOOST_ROOT="${{ github.workspace }}/vcpkg_installed/${{ matrix.arch == 'macosx_arm64' && 'arm64' || 'x64' }}-osx"
             MACOSX_DEPLOYMENT_TARGET=15
-        with:
-          extras: uv
+          CIBW_TEST_REQUIRES: pytest vapoursynth
+          CIBW_TEST_COMMAND: pytest -v {project}/tests
 
       - name: Upload VapourSynth plugin
         uses: actions/upload-artifact@v7

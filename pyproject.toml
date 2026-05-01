@@ -23,7 +23,7 @@ maintainers = [
 dependencies = ["vapoursynth>=74"]
 
 [dependency-groups]
-dev = ["hatchling>=1.27.0", "packaging"]
+dev = ["hatchling>=1.27.0", "packaging", "pytest>=9.0.0"]
 
 [project.urls]
 "Source Code" = "https://github.com/Jaded-Encoding-Thaumaturgy/vapoursynth-knlmeanscl"

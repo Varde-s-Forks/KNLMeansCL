@@ -25,14 +25,14 @@ jobs:
         env:
           CIBW_BUILD: cp312-*
           CIBW_ARCHS_LINUX: ${{ matrix.arch }}
-          CIBW_BUILD_FRONTEND: uv
           CIBW_BEFORE_ALL_LINUX: >
             dnf install -y epel-release &&
             dnf --enablerepo=powertools install -y ocl-icd-devel boost-devel pkgconf-pkg-config
           CIBW_ENVIRONMENT: MESON_ARGS="-Denable_avs=false -Dstatic=true"
           CIBW_SKIP: "*-musllinux*"
-        with:
-          extras: uv
+          CIBW_TEST_REQUIRES: pytest vapoursynth
+          CIBW_TEST_COMMAND: pytest -v {project}/tests
+          CIBW_BEFORE_TEST_LINUX: dnf install -y epel-release && dnf install -y pocl
 
       - name: Upload VapourSynth plugin
         uses: actions/upload-artifact@v7
